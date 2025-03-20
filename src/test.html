@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Rental Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="text-gray-600 font-body bg-gray-100">
+    <div class="container mx-auto mt-10 p-3">
+        <h2 class="text-2xl font-bold mb-4 mt-5 text-center">รายการของรถที่พร้อมจอง</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6" id="carList">
+            <!-- Data will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        function fetchCars() {
+            fetch("http://localhost/Car4rentWebsite/fetch_cars.php")
+                .then(response => response.json())
+                .then(data => {
+                    const carList = document.getElementById("carList");
+                    carList.innerHTML = "";
+                    data.forEach(car => {
+                        const carItem = `
+                            <div class="bg-white border border-gray-300 shadow-md rounded-lg p-4">
+                                <img src="https://www.toyotanont.com/public/uploads/cars/2/grade/e7fc14235db44cb65c7e53ac5abc7c32.png" alt="${car.brand} ${car.model}" class="w-full rounded-md mt-5" />
+                                <h3 class="text-lg font-semibold mt-2">${car.brand} ${car.model}</h3>
+                                <p class="text-gray-500 text-sm">หรืออื่นๆ ที่คล้ายกัน</p>
+                                <p class="text-gray-600 mt-1">👤 ${car.seats} | 🧳 ${car.luggage_capacity} | 🚗 ${car.wheel_type}</p>
+                                <p class="text-lg font-bold text-black mt-2">฿${car.price_per_day} / วัน</p>
+                                <button class="bg-yellow-300 hover:bg-black hover:text-white w-full py-2 rounded mt-3">
+                                    ดูข้อเสนอ
+                                </button>
+                            </div>
+                        `;
+                        carList.innerHTML += carItem;
+                    });
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+
+        fetchCars();
+    </script>
+</body>
+</html>

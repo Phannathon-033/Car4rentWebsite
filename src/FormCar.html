@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มข้อมูลรถ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-4 text-center">เพิ่ม/แก้ไขข้อมูลรถ</h2>
+
+        <form id="carForm" class="space-y-4">
+            <input type="text" id="car_id" placeholder="รหัสรถ" class="w-full p-2 border rounded">
+            <input type="text" id="brand" placeholder="ยี่ห้อรถ" class="w-full p-2 border rounded">
+            <input type="text" id="model" placeholder="รุ่นรถ" class="w-full p-2 border rounded">
+            <input type="number" id="seats" placeholder="จำนวนที่นั่ง" class="w-full p-2 border rounded">
+            <input type="number" id="luggage_capacity" placeholder="ความจุของกระเป๋า (ลิตร)" class="w-full p-2 border rounded">
+            <input type="text" id="wheel_type" placeholder="ประเภทล้อรถ" class="w-full p-2 border rounded">
+            <input type="number" id="price_per_day" placeholder="ราคาต่อวัน (บาท)" class="w-full p-2 border rounded">
+
+            <button type="submit" id="submitBtn" class="w-full bg-yellow-400 text-gray p-2 rounded hover:bg-blue-600">
+                เพิ่มข้อมูล
+            </button>
+
+            <button type="button" id="clearForm" class="w-full bg-gray-400 text-white p-2 rounded hover:bg-gray-500 mt-2">
+                ล้างข้อมูล
+            </button>
+        </form>
+    </div>
+        
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editCarData = localStorage.getItem("editCarData");
+            if (editCarData) {
+                const car = JSON.parse(editCarData);
+                document.getElementById("car_id").value = car.car_id;
+                document.getElementById("brand").value = car.brand;
+                document.getElementById("model").value = car.model;
+                document.getElementById("seats").value = car.seats;
+                document.getElementById("luggage_capacity").value = car.luggage_capacity;
+                document.getElementById("wheel_type").value = car.wheel_type;
+                document.getElementById("price_per_day").value = car.price_per_day;
+                document.getElementById("submitBtn").textContent = "อัปเดตข้อมูล";
+                localStorage.removeItem("editCarData");
+            }
+        });
+
+        document.getElementById("carForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            
+            const carData = {
+                car_id: document.getElementById("car_id").value,
+                brand: document.getElementById("brand").value,
+                model: document.getElementById("model").value,
+                seats: document.getElementById("seats").value,
+                luggage_capacity: document.getElementById("luggage_capacity").value,
+                wheel_type: document.getElementById("wheel_type").value,
+                price_per_day : document.getElementById("price_per_day").value
+            };
+
+            let apiURL = "http://localhost/Car4rentWebsite/add_car.php";
+            let successMessage = "เพิ่มข้อมูลสำเร็จ";
+            
+            if (document.getElementById("submitBtn").textContent === "อัปเดตข้อมูล") {
+                apiURL = "http://localhost/Car4rentWebsite/update_car.php";
+                successMessage = "อัปเดตข้อมูลสำเร็จ";
+            }
+
+            fetch(apiURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(carData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(successMessage);
+                window.location.href = "Admin.html";
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+        
+</body>
+</html>

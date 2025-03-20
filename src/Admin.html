@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PHP and JavaScript CRUD Project: PDO and API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+    <body class="text-gray-600 font-body bg-gray-100">
+      <div class="container mx-auto mt-10 p-3">
+        <!-- Header -->
+        <div class="flex flex-wrap justify-between items-center">
+          <!-- logo -->
+          <div class="flex-1 flex p-3 items-end">
+            <img src="img/logo1.png" alt="Logo" class="w-24 h-auto md:w-32" />
+            <h1
+              class="text-3xl text-pink-600 font-semibold lg:block hidden mr-2 mb-11"
+            >
+              car4rent :
+            </h1>
+            <h2 class="lg:block hidden mr-2 mb-12">
+              PHP and JavaScript CRUD Project
+            </h2>
+          </div>
+
+          <!-- Hamburger Menu -->
+          <div class="px-4 cursor-pointer lg:hidden" id="burger">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </div>
+
+
+
+          <!-- Menu -->
+    <div class="container mx-auto">
+        <h2 class="text-2xl font-bold mb-4 mt-5 text-center">รายการของรถที่พร้อมจอง</h2>
+        <table class="w-full border-collapse border border-blue-500 bg-white">
+            <thead>
+                <tr class="bg-yellow-400 text-gray">
+                    <th class="border border-yellow-400 px-4 py-2">รหัสรถ</th>
+                    <th class="border border-yellow-400 px-4 py-2">ยี่ห้อ</th>
+                    <th class="border border-yellow-400 px-4 py-2">รุ่น</th>
+                    <th class="border border-yellow-400 px-4 py-2">ที่นั่ง</th>
+                    <th class="border border-yellow-400 px-4 py-2">กระเป๋า</th>
+                    <th class="border border-yellow-400 px-4 py-2">ล้อ</th>
+                    <th class="border border-yellow-400 px-4 py-2">ราคาต่อวัน (บาท)</th>
+                    <th class="border border-yellow-400 px-4 py-2">แก้ไขข้อมูล</th>
+                    <th class="border border-yellow-400 px-4 py-2">ลบข้อมูลรถ</th>
+                </tr>
+            </thead>
+            <tbody id="carTableBody">
+                <!-- Data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex justify-center mt-6 mb-4">
+      <button id="addCarBtn" class="bg-green-500 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-600">
+          ➕ เพิ่มข้อมูล
+      </button>
+  </div>
+
+
+    <script>
+        function fetchCars() {
+            fetch("http://localhost/Car4rentWebsite/fetch_cars.php")
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById("carTableBody");
+                    tableBody.innerHTML = "";
+                    data.forEach(car => {
+                        const row = `<tr>
+                            <td class='border px-4 py-2 text-center'>${car.car_id}</td>
+                            <td class='border px-4 py-2 text-center'>${car.brand}</td>
+                            <td class='border px-4 py-2 text-center'>${car.model}</td>
+                            <td class='border px-4 py-2 text-center'>${car.seats}</td>
+                            <td class='border px-4 py-2 text-center'>${car.luggage_capacity}</td>
+                            <td class='border px-4 py-2 text-center'>${car.wheel_type}</td>
+                            <td class='border px-4 py-2 text-center'>${car.price_per_day} บาท</td>
+                            <td class='border px-4 py-2 text-center'>
+                                <button onclick="editCar('${car.car_id}')" class='bg-blue-500 text-white px-2 py-1 rounded'>แก้ไข</button>
+                            <td class='border px-4 py-2 text-center'>
+                                <button onclick="deleteCar('${car.car_id}')" class='bg-red-500 text-white px-2 py-1 rounded'>ลบ</button>
+                            </td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+
+        function editCar(carId) {
+            fetch(`http://localhost/Car4rentWebsite/fetch_cars.php?car_id=${carId}`)
+                .then(response => response.json())
+                .then(car => {
+                    localStorage.setItem("editCarData", JSON.stringify(car));
+                    window.location.href = "FormCar.html";
+                })
+                .catch(error => console.error("Error fetching car data:", error));
+        }
+        
+        function deleteCar(carId) {
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรถคันนี้?")) {
+                fetch("http://localhost/Car4rentWebsite/delete_car.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ car_id: carId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    fetchCars();
+                })
+                .catch(error => console.error("Error deleting car:", error));
+            }
+        }
+
+        fetchCars();
+
+        document.getElementById("addCarBtn").addEventListener("click", function () {
+    window.location.href = "http://localhost/Car4rentWebsite/src/FormCar.html";
+});
+
+    </script>
+</body>
+</html>
